@@ -174,6 +174,45 @@ export const setupSockets = (io: Server) => {
       io.emit('buttonNameChanged', newName);
     });
 
+    socket.on('resetToGreen', async () => {
+      if (socket.data.user.role !== 'ADMIN') return;
+      let currentCycle = await prisma.buttonCycle.findFirst({ where: { isActive: true } });
+      if (!currentCycle || currentCycle.status !== 'RED') return;
+
+      currentCycle = await prisma.buttonCycle.update({
+        where: { id: currentCycle.id },
+        data: { status: 'GREEN', currentOwnerId: null, redSince: null }
+      });
+      
+      await prisma.clickHistory.create({ data: { userId: socket.data.user.id, action: 'ADMIN_FORCE_GREEN' } });
+      await buttonQueue.remove(`release_${currentCycle.id}`);
+
+      // Process waitlist
+      const nextUser = await prisma.waitlist.findFirst({
+        where: { cycleId: currentCycle.id, status: 'WAITING' },
+        orderBy: { joinedAt: 'asc' }
+      });
+
+      if (nextUser) {
+        await prisma.waitlist.update({ where: { id: nextUser.id }, data: { status: 'NOTIFIED' } });
+        const until = new Date(Date.now() + 60 * 1000);
+        currentCycle = await prisma.buttonCycle.update({
+          where: { id: currentCycle.id },
+          data: { priorityUserId: nextUser.userId, priorityUntil: until }
+        });
+        await buttonQueue.add('expirePriority', { cycleId: currentCycle.id, userId: nextUser.userId }, { delay: 60 * 1000, jobId: `priority_${currentCycle.id}` });
+        
+        const newWaitlist = await getWaitlistData(currentCycle.id);
+        io.emit('waitlistUpdated', newWaitlist);
+      }
+      
+      io.emit('buttonStateChanged', {
+        status: 'GREEN',
+        priorityUserId: currentCycle.priorityUserId,
+        priorityUntil: currentCycle.priorityUntil
+      });
+    });
+
     socket.on('disconnect', () => {
       console.log(`User disconnected: ${socket.data.user.username}`);
     });
