@@ -15,7 +15,7 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType>({} as SocketContextType);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [buttonState, setButtonState] = useState<SocketContextType['buttonState']>({ status: 'GREEN' });
 
