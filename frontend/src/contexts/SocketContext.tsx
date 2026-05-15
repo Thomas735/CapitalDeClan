@@ -5,10 +5,12 @@ import { useAuth } from './AuthContext';
 interface SocketContextType {
   socket: Socket | null;
   buttonState: {
+    name: string;
     status: 'GREEN' | 'RED' | 'GRAY';
     owner?: string;
     priorityUserId?: string;
     priorityUntil?: Date;
+    waitlist: string[];
   };
 }
 
@@ -17,7 +19,7 @@ const SocketContext = createContext<SocketContextType>({} as SocketContextType);
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [buttonState, setButtonState] = useState<SocketContextType['buttonState']>({ status: 'GREEN' });
+  const [buttonState, setButtonState] = useState<SocketContextType['buttonState']>({ name: 'TTF S', status: 'GREEN', waitlist: [] });
 
   useEffect(() => {
     if (token) {
@@ -31,7 +33,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
 
       newSocket.on('buttonStateChanged', (state) => {
-        setButtonState(state);
+        setButtonState(prev => ({ ...prev, ...state }));
+      });
+
+      newSocket.on('waitlistUpdated', (newList) => {
+        setButtonState(prev => ({ ...prev, waitlist: newList }));
+      });
+
+      newSocket.on('buttonNameChanged', (newName) => {
+        setButtonState(prev => ({ ...prev, name: newName }));
       });
 
       newSocket.on('errorMsg', (msg) => {

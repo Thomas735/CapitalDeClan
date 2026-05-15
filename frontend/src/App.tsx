@@ -12,7 +12,7 @@ const MainContent: React.FC = () => {
   if (!user) {
     return (
       <div className="app-container">
-        <h1>THE BUTTON</h1>
+        <h1>TTF S</h1>
         <AuthForm />
       </div>
     );
@@ -22,10 +22,10 @@ const MainContent: React.FC = () => {
     <SocketProvider>
       <div className="app-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>THE BUTTON</h1>
-          <button className="btn-secondary" onClick={logout}>Logout</button>
+          <h1>TTF S</h1>
+          <button className="btn-secondary" onClick={logout}>Se déconnecter</button>
         </div>
-        <p style={{ textAlign: 'center', color: '#94a3b8' }}>Welcome, {user.username}</p>
+        <p style={{ textAlign: 'center', color: '#94a3b8' }}>Bienvenue, {user.username}</p>
         <TheButton />
       </div>
     </SocketProvider>

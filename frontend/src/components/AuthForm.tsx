@@ -24,13 +24,13 @@ export const AuthForm: React.FC = () => {
 
   return (
     <div className="auth-form-container">
-      <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+      <h2>{isLogin ? 'Bon retour' : 'Créer un compte'}</h2>
       {error && <p style={{ color: '#ef4444' }}>{error}</p>}
       <form onSubmit={handleSubmit} className="auth-form">
         <input 
           className="input-field" 
           type="text" 
-          placeholder="Username" 
+          placeholder="Nom d'utilisateur" 
           value={username} 
           onChange={(e) => setUsername(e.target.value)} 
           required 
@@ -38,17 +38,17 @@ export const AuthForm: React.FC = () => {
         <input 
           className="input-field" 
           type="password" 
-          placeholder="Password" 
+          placeholder="Mot de passe" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
           required 
         />
         <button className="btn-primary" type="submit">
-          {isLogin ? 'Login' : 'Register'}
+          {isLogin ? 'Se connecter' : "S'inscrire"}
         </button>
       </form>
       <button className="btn-secondary" onClick={() => setIsLogin(!isLogin)}>
-        {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
+        {isLogin ? "Pas encore de compte ? S'inscrire" : 'Déjà un compte ? Se connecter'}
       </button>
     </div>
   );

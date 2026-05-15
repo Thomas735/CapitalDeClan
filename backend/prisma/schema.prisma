@@ -6,10 +6,16 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id            String   @id @default(uuid())
   username      String   @unique
   password_hash String
+  role          Role     @default(USER)
   createdAt     DateTime @default(now())
 
   ownedCycles   ButtonCycle[] @relation("CycleOwner")
@@ -27,6 +33,7 @@ enum ButtonStatus {
 
 model ButtonCycle {
   id                String       @id @default(uuid())
+  name              String       @default("TTF S")
   status            ButtonStatus @default(GREEN)
   currentOwnerId    String?
   currentOwner      User?        @relation("CycleOwner", fields: [currentOwnerId], references: [id])

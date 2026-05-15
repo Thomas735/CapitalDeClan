@@ -18,20 +18,33 @@ export const setupSockets = (io: Server) => {
     }
   });
 
+  const getWaitlistData = async (cycleId: string) => {
+    const waitlist = await prisma.waitlist.findMany({
+      where: { cycleId, status: 'WAITING' },
+      orderBy: { joinedAt: 'asc' },
+      include: { user: true }
+    });
+    return waitlist.map(w => w.user.username);
+  };
+
   io.on('connection', async (socket: Socket) => {
     console.log(`User connected: ${socket.data.user.username}`);
 
     // Send initial state
     let cycle = await prisma.buttonCycle.findFirst({ where: { isActive: true }, include: { currentOwner: true, priorityUser: true } });
     if (!cycle) {
-      cycle = await prisma.buttonCycle.create({ data: { status: 'GREEN', isActive: true }, include: { currentOwner: true, priorityUser: true } });
+      cycle = await prisma.buttonCycle.create({ data: { status: 'GREEN', isActive: true, name: 'TTF S' }, include: { currentOwner: true, priorityUser: true } });
     }
     
+    const waitlist = await getWaitlistData(cycle.id);
+
     socket.emit('initialState', {
+      name: cycle.name,
       status: cycle.status,
       owner: cycle.currentOwner?.username,
       priorityUserId: cycle.priorityUserId,
-      priorityUntil: cycle.priorityUntil
+      priorityUntil: cycle.priorityUntil,
+      waitlist
     });
 
     socket.on('clickButton', async () => {
@@ -68,6 +81,10 @@ export const setupSockets = (io: Server) => {
               data: { priorityUserId: nextUser.userId, priorityUntil: until }
             });
             await buttonQueue.add('expirePriority', { cycleId: currentCycle.id, userId: nextUser.userId }, { delay: 60 * 1000, jobId: `priority_${currentCycle.id}` });
+            
+            // Broadcast updated waitlist
+            const newWaitlist = await getWaitlistData(currentCycle.id);
+            io.emit('waitlistUpdated', newWaitlist);
           }
           
           io.emit('buttonStateChanged', {
@@ -140,8 +157,21 @@ export const setupSockets = (io: Server) => {
       if (existing) return;
 
       await prisma.waitlist.create({ data: { cycleId: currentCycle.id, userId } });
-      const count = await prisma.waitlist.count({ where: { cycleId: currentCycle.id, status: 'WAITING' } });
-      socket.emit('waitlistJoined', { count });
+      const newWaitlist = await getWaitlistData(currentCycle.id);
+      io.emit('waitlistUpdated', newWaitlist);
+    });
+
+    socket.on('changeButtonName', async (newName: string) => {
+      if (socket.data.user.role !== 'ADMIN') return;
+      const currentCycle = await prisma.buttonCycle.findFirst({ where: { isActive: true } });
+      if (!currentCycle) return;
+
+      await prisma.buttonCycle.update({
+        where: { id: currentCycle.id },
+        data: { name: newName }
+      });
+
+      io.emit('buttonNameChanged', newName);
     });
 
     socket.on('disconnect', () => {
