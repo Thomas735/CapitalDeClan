@@ -23,6 +23,10 @@ export const TheButton: React.FC = () => {
     }
   };
 
+  const handleResetToGreen = () => {
+    socket?.emit('resetToGreen');
+  };
+
   const isOwner = buttonState.owner === user?.username;
   const inWaitlist = user ? buttonState.waitlist.includes(user.username) : false;
   const waitlistIndex = user ? buttonState.waitlist.indexOf(user.username) : -1;
@@ -33,19 +37,26 @@ export const TheButton: React.FC = () => {
     <div className="the-button-container" style={{ flexDirection: 'column' }}>
       
       {user?.role === 'ADMIN' && (
-        <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #334155', borderRadius: '8px' }}>
+        <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #334155', borderRadius: '8px', width: '100%', maxWidth: '400px' }}>
           <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>Espace Administrateur</h3>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="Nouveau nom du bouton" 
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-            <button className="btn-primary" onClick={handleChangeName} style={{ whiteSpace: 'nowrap' }}>
-              Changer le nom
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="Nouveau nom du bouton" 
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+              <button className="btn-primary" onClick={handleChangeName} style={{ whiteSpace: 'nowrap' }}>
+                Changer le nom
+              </button>
+            </div>
+            {buttonState.status === 'RED' && (
+              <button className="btn-secondary" onClick={handleResetToGreen} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+                Forcer en Vert (Kick Owner)
+              </button>
+            )}
           </div>
         </div>
       )}
