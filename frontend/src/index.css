@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent-color: #3b82f6;
+  
+  --green-glow: rgba(34, 197, 94, 0.5);
+  --red-glow: rgba(239, 68, 68, 0.5);
+  --gray-glow: rgba(156, 163, 175, 0.2);
+
+  --btn-green: #22c55e;
+  --btn-red: #ef4444;
+  --btn-gray: #9ca3af;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  background-image: radial-gradient(circle at top, #1e293b, #0f172a);
+}
+
+.app-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(to right, #38bdf8, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Button */
+.the-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.the-button {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  outline: none;
+}
+
+.the-button:active {
+  transform: scale(0.95);
+}
+
+.the-button.GREEN {
+  background: radial-gradient(circle at top left, #4ade80, var(--btn-green));
+  box-shadow: 0 0 40px var(--green-glow), inset 0 -10px 20px rgba(0,0,0,0.2);
+}
+
+.the-button.RED {
+  background: radial-gradient(circle at top left, #f87171, var(--btn-red));
+  box-shadow: 0 0 40px var(--red-glow), inset 0 -10px 20px rgba(0,0,0,0.2);
+}
+
+.the-button.GRAY {
+  background: radial-gradient(circle at top left, #d1d5db, var(--btn-gray));
+  box-shadow: 0 0 20px var(--gray-glow), inset 0 -10px 20px rgba(0,0,0,0.2);
+  cursor: not-allowed;
+}
+
+/* Status Text */
+.status-text {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  height: 2rem;
+}
+
+/* Auth Forms */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-field {
+  padding: 1rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.btn-primary {
+  padding: 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+/* Waitlist */
+.waitlist-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.btn-secondary {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: #94a3b8;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}

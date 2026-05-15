@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  username      String   @unique
+  password_hash String
+  createdAt     DateTime @default(now())
+
+  ownedCycles   ButtonCycle[] @relation("CycleOwner")
+  priorityCycles ButtonCycle[] @relation("CyclePriority")
+  cycleUsers    CycleUser[]
+  waitlists     Waitlist[]
+  clickHistory  ClickHistory[]
+}
+
+enum ButtonStatus {
+  GREEN
+  RED
+  GRAY
+}
+
+model ButtonCycle {
+  id                String       @id @default(uuid())
+  status            ButtonStatus @default(GREEN)
+  currentOwnerId    String?
+  currentOwner      User?        @relation("CycleOwner", fields: [currentOwnerId], references: [id])
+  redSince          DateTime?
+  priorityUserId    String?
+  priorityUser      User?        @relation("CyclePriority", fields: [priorityUserId], references: [id])
+  priorityUntil     DateTime?
+  createdAt         DateTime     @default(now())
+  isActive          Boolean      @default(true)
+
+  cycleUsers        CycleUser[]
+  waitlists         Waitlist[]
+}
+
+model CycleUser {
+  cycleId String
+  userId  String
+  cycle   ButtonCycle @relation(fields: [cycleId], references: [id])
+  user    User        @relation(fields: [userId], references: [id])
+
+  @@id([cycleId, userId])
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  PASSED
+}
+
+model Waitlist {
+  id        String         @id @default(uuid())
+  cycleId   String
+  userId    String
+  status    WaitlistStatus @default(WAITING)
+  joinedAt  DateTime       @default(now())
+
+  cycle     ButtonCycle    @relation(fields: [cycleId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+}
+
+model ClickHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
